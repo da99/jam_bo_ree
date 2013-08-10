@@ -21,8 +21,7 @@ local WHITE = "%s+";
 -- ================== Helpers =====================================
 -- ================================================================
 local function canon_name(str)
-  local val = string.gsub(stringx.strip(string.upper(str)), WHITE, " ")
-  return val
+  return (string.gsub(stringx.strip(string.upper(str)), WHITE, " "))
 end
 
 
@@ -205,60 +204,6 @@ end
 -- ================== Run (private) ===============================
 -- ================================================================
 
-function Run.do_next(self, ...)
-
-  local args = {...}
-  if (#args == 1) then
-    self.val = args[1]
-  end
-
-  self.last = args[1];
-
-  local _next  = _.shift(self.tasks)
-
-  if _next then
-    _next(Task_Env.new(self), self.last);
-  else
-
-    self.is_done = true
-
-    if self.parent then
-      return self.parent:finish(last)
-    end
-
-  end
-
-  return self;
-end
-
-
-function Run.run(self)
-
-  if (self.tasks) then
-    error("Already running.");
-  end
-
-  self.tasks = {}
-  if not self.parent then
-    _.push( self.tasks, self.tally:list('parent run') )
-  end
-
-  _.each(self.proc_list, function (name)
-    if (_.isFunction(name)) then
-      return _.push(self.tasks, name);
-    end
-
-    _.push(self.tasks, self.tally:entire_list_for(name));
-
-  end)
-
-  self.tasks = _.flatten(self.tasks);
-
-  self:do_next();
-  return
-end
-
-
 function Run.new(tally, parent, init_data, arr)
 
   local r = {
@@ -278,6 +223,59 @@ function Run.new(tally, parent, init_data, arr)
   end);
 
   return r;
+end
+
+
+function Run.run(self)
+
+  if (self.tasks) then
+    error("Already running.");
+  end
+
+  self.tasks = {}
+
+  -- If this is an adam/eve run, then do 'parent run'
+  if not self.parent then
+    _.push( self.tasks, self.tally:list('parent run') )
+  end
+
+  _.each(self.proc_list, function (name)
+    if (_.isFunction(name)) then
+      return _.push(self.tasks, name);
+    end
+
+    _.push(self.tasks, self.tally:entire_list_for(name));
+
+  end)
+
+  self.tasks = _.flatten(self.tasks);
+
+  _.each(self.tasks, function (func)
+    if (self.is_done) then
+      return;
+    end
+
+    local vals = {func(Task_Env.new(self), self.last)}
+    local l    = set('#', vals)
+    if l = 0 then
+      self.last = nil
+    elseif l = 1 then
+      self.last = vals[1]
+    else
+      self.parent:finish(vals[1], vals[2])
+      self.is_done = true
+    end
+  end);
+
+  if (self.is_done) then
+    return
+  end
+
+  if self.parent then
+    return self.parent:finish(self.last)
+  end
+
+  return self.last
 end
 
 
