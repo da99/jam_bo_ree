@@ -1,4 +1,6 @@
 
+require 'pl.strict'
+
 local setmetatable = setmetatable
 local print        = print
 
