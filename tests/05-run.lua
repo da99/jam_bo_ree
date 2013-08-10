@@ -11,27 +11,27 @@ describe( 'run', function ()
   it( 'runs functions in sequential order', function ()
     local d = {};
     One:run(
-      function (o) { d.push(1); o.finish(); },
-      function (o) { d.push(2); o.finish(); }
-    );
-    assert.same(d, [1,2]);
-  end);
+      function (o) d.push(1); o.finish() end,
+      function (o) d.push(2); o.finish() end
+    )
+    assert.same(d, [1,2])
+  end)
 
   it( 'finishes parent when functions are done', function ()
     local d = {};
 
     One:on('finishes parent', function (o)
-      d.push(1);
+      d.push(1)
       Two:run(
         o,
-        function (o) { d.push(2); o.finish(); },
-        function (o) { d.push(3); o.finish(); }
-     );
-   end);
+        function (o) { d.push(2) o.finish() },
+        function (o) { d.push(3) o.finish() }
+     )
+   end)
 
-    One:run('finishes parent');
+    One:run('finishes parent')
 
-    assert.same(d, [1,2,3]);
-  end);
+    assert.same(d, [1,2,3])
+  end)
 
-end); -- === end desc
+end) -- === end desc

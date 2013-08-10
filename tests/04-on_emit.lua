@@ -7,32 +7,32 @@ local _      = require("underscore")._
 ;
 
 TH:on('parent run', function (o)
-  o.data.result.push('parent run');
-  o.finish();
-end);
+  o.data.result.push('parent run')
+  o.finish()
+end)
 
 TH:on('add', function (o)
-  o.data.result.push('add');
-  H:run(o, 'sub', o.data);
-end);
+  o.data.result.push('add')
+  H:run(o, 'sub', o.data)
+end)
 
 H:on('sub', function (o)
-  o.data.result.push('sub');
-  H:run(o, 'div', o.data);
-end);
+  o.data.result.push('sub')
+  H:run(o, 'div', o.data)
+end)
 
 H:on('div', function (o)
-  o.data.result.push('div');
-  o.finish();
-end);
+  o.data.result.push('div')
+  o.finish()
+end)
 
 describe( 'parent run', function ()
 
-  it( 'runs function only once', function () {
+  it( 'runs function only once', function ()
       local o = {result={}};
       TH:run('add', o, function ()
-        assert.same(o.result, ['parent run', 'add', 'sub', 'div']);
-      end);
-  end);
+        assert.same(o.result, ['parent run', 'add', 'sub', 'div'])
+      end)
+  end)
 
-end); -- === end desc
+end) -- === end desc

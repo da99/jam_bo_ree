@@ -9,12 +9,12 @@ describe( 'val', function ()
   it( 'does not get updated with .finish()', function ()
     local v = 0;
 
-    One:on('one', function (o) o.finish(1) end);
-    One:on('after one', function (o) o.finish() end);
+    One:on('one', function (o) o.finish(1) end)
+    One:on('after one', function (o) o.finish() end)
 
-    One:run('one', function (o) v = o.val end);
+    One:run('one', function (o) v = o.val end)
 
-    assert.equal(v, 1);
-  end);
+    assert.equal(v, 1)
+  end)
 
-end); -- === end desc
+end) -- === end desc

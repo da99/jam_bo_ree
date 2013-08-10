@@ -5,19 +5,19 @@ local _      = require("underscore")._
 ;
 
 One:on('before hello', function (f)
-  f.data.hello.push('before hello');
-  f.finish();
-end);
+  f.data.hello.push('before hello')
+  f.finish()
+end)
 
 One:on('hello', function (f)
-  f.data.hello.push('hello');
-  f.finish();
-end);
+  f.data.hello.push('hello')
+  f.finish()
+end)
 
 One:on('goodbye', function (f)
-  f.data.hello.push('goodbye');
-  f.finish();
-end);
+  f.data.hello.push('goodbye')
+  f.finish()
+end)
 
 describe( '.detour', function ()
 
@@ -25,22 +25,22 @@ describe( '.detour', function ()
     local o = {hello={}};
     One:run('hello', o, function (f)
       f.detour('goodbye', function (f)
-        f.data.hello.push("last goodbye");
-      end);
-    end);
+        f.data.hello.push("last goodbye")
+      end)
+    end)
 
-    assert.same(o, {hello=['before hello', 'hello', 'goodbye', 'last goodbye']});
-  end);
+    assert.same(o, {hello=['before hello', 'hello', 'goodbye', 'last goodbye']})
+  end)
 
   it( 'includes data of parent', function ()
     local o = {hello={}};
     One:run('hello', o, function (f)
       f.detour('goodbye', function (f)
-        f.data.hello.push("last goodbye");
-      end);
-    end);
+        f.data.hello.push("last goodbye")
+      end)
+    end)
 
-    assert.same(o, {hello=['before hello', 'hello', 'goodbye', 'last goodbye']});
-  end);
+    assert.same(o, {hello=['before hello', 'hello', 'goodbye', 'last goodbye']})
+  end)
 
-end); -- === end desc
+end) -- === end desc
