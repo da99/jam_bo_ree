@@ -20,7 +20,7 @@ end)
 -- .RUN ------------------------------------------------
 describe( '.run', function ()
 
-  it("runs funcs in order added", function ()
+  it("runs funcs in order #added", function ()
     local j = Jam.new()
     local o = {}
     j:on( 'add', function () _.push(o, 1) end)
@@ -127,7 +127,7 @@ describe( '.run .includes', function ()
   it( 'runs events in .includes', function ()
     local t1 = Jam.new()
     t1:on('one', function (f) _.push(f.data.vals, 1) end)
-    t1:on('two', function (f) _.push(f.data.valsm 2) end)
+    t1:on('two', function (f) _.push(f.data.vals, 2) end)
 
     local t2 = Jam.new(t1, t1, t1)
     t2:on('one', function (f) _.push(f.data.vals, 3) end)

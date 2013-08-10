@@ -3,6 +3,7 @@
 local setmetatable = setmetatable
 local print        = print
 
+local unpack       = unpack
 local stringx      = require 'pl.stringx'
 local sip          = require 'pl.sip'
 local pl_utils     = require 'pl.utils'
@@ -11,13 +12,17 @@ local _            = require 'underscore'
 local M     = {}
 local meta  = {}
 
+local Run = {}
+local Task_Env = {}
+
 local WHITE = "%s+";
 
 -- ================================================================
 -- ================== Helpers =====================================
 -- ================================================================
 local function canon_name(str)
-  return string.gsub(stringx.strip(string.upper(str)), WHITE, " ")
+  local val = string.gsub(stringx.strip(string.upper(str)), WHITE, " ")
+  return val
 end
 
 
@@ -77,9 +82,9 @@ meta = {
 
   entire_list_for = function (self, name)
     local arr = {
-      self:list_with_includes('before ' + name),
+      self:list_with_includes('before ' .. name),
       self:list_with_includes(name),
-      self:list_with_includes('after '  + name)
+      self:list_with_includes('after '  .. name)
     }
 
     return _.flatten(arr);
@@ -88,7 +93,7 @@ meta = {
   list_with_includes = function (self, raw_name)
     local me  = self;
     local arr = {};
-    _.push(arr, _.map(me.includes, function (t)
+    _.push(arr, _.map(self.includes, function (t)
       if (t == me) then
         return t:list(raw_name)
       else
@@ -103,7 +108,7 @@ meta = {
     local args  = {...}
     local tasks = {}
     if (#self:entire_list_for(args[1]) == 0) then
-      error("Error handlers not found for: " + args[1])
+      error("Error handlers not found for: " .. args[1])
     end
 
     return self:run(unpack(args))
@@ -117,7 +122,7 @@ meta = {
       _.push(self:list(name, true), func);
     end);
 
-    return me;
+    return self;
   end,
 
   run = function (self, ...)
@@ -158,7 +163,7 @@ meta = {
       //    .run(parent,     func1, func2);
       //
     ]]--
-    if (str_funcs.length == 0) then
+    if ((not str_funcs) or #str_funcs == 0) then
       local t    = M.new()
       local name = 'one-off'
       _.each(funcs, function (f)
@@ -199,7 +204,6 @@ end
 -- ================================================================
 -- ================== Run (private) ===============================
 -- ================================================================
-local Run = {}
 
 function Run.do_next(self, ...)
 
@@ -210,7 +214,7 @@ function Run.do_next(self, ...)
 
   self.last = args[1];
 
-  local _next  = _.shift(me.tasks)
+  local _next  = _.shift(self.tasks)
 
   if _next then
     _next(Task_Env.new(self), self.last);
@@ -224,7 +228,7 @@ function Run.do_next(self, ...)
 
   end
 
-  return me;
+  return self;
 end
 
 
@@ -281,7 +285,6 @@ end
 -- ================== Task_Env (private) ==========================
 -- ================================================================
 
-local Task_Env = {}
 
 Task_Env.new = function (run)
   local t  = {}
