@@ -114,8 +114,8 @@ describe( '.run .includes', function ()
     t2._val = 2;
 
     local t3 = Jam.new(t1, t2)
-    assert.equal(t3.includes[0]._val, t1._val)
-    assert.equal(t3.includes[1]._val, t2._val)
+    assert.equal(t3.includes[1]._val, t1._val)
+    assert.equal(t3.includes[2]._val, t2._val)
   end)
 
   it( 'filters out duplicates among arguments in .includes', function ()
