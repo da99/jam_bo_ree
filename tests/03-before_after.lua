@@ -6,27 +6,22 @@ local _      = require("underscore")._
 
 TH:on('before add', function (o)
   o.data.result.push(1)
-  o.finish()
 end)
 
 TH:on('before add', function (o)
   o.data.result.push(2)
-  o.finish()
 end)
 
 TH:on('add', function (o)
   o.data.result.push(3)
-  o.finish()
 end)
 
 TH:on('after add', function (o)
   o.data.result.push(4)
-  o.finish()
 end)
 
 TH:on('after add', function (o)
   o.data.result.push(5)
-  o.finish()
 end)
 
 

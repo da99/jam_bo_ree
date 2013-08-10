@@ -6,16 +6,16 @@ local _      = require("underscore")._
   , Third  = require("../lib/tally_ho").Tally_Ho.new()
 
 One:on('one', function (o)
-  o.finish(1)
+  return 1
 end)
 
 One:on('two', function (o)
-  o.finish(2)
+  return 2
 end)
 
 One:on('after two', function (o)
   assert.equal(o.last, 2)
-  o.finish(3)
+  return 3
 end)
 
 describe( 'finish', function ()
@@ -35,10 +35,10 @@ describe( 'finish', function ()
   it( 'throws error if Run is done', function ()
     Two:on('finish run', function (o)
       o.run.is_done = true;
-      return o.finish(1)
+      return 1
     end)
 
-    Two:on('finish run', function (o) return o.finish(2) end)
+    Two:on('finish run', function (o) return 2 end)
 
     local err = null
 
@@ -53,8 +53,8 @@ describe( 'finish', function ()
 
   it( 'throws error if called more than once', function ()
     Two:on('finish 2', function (o)
-      o.finish(1)
-      o.finish(2)
+      return 1
+      return 2
     end)
 
     Two:on('finish 2', function (o) end)

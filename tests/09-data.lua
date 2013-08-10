@@ -9,7 +9,6 @@ describe( 'data', function ()
   it( 'holds changes done in callbacks', function ()
     One:on('change', function (f)
       f.data.a = 1;
-      f.finish()
     end)
 
     local data = {};
@@ -21,7 +20,6 @@ describe( 'data', function ()
   it( 'merges changes done in callbacks', function ()
     One:on('merge', function (f)
       f.data.b = 2;
-      f.finish()
     end)
 
     local data = {};
@@ -33,7 +31,6 @@ describe( 'data', function ()
   it( 'merges multiple objects into the first', function ()
     One:on('multi-merge', function (f)
       f.data.c = 3;
-      f.finish()
     end)
 
     local d1 = {}, d2 = {d=4};

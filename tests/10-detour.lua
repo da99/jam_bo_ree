@@ -6,17 +6,14 @@ local _      = require("underscore")._
 
 One:on('before hello', function (f)
   f.data.hello.push('before hello')
-  f.finish()
 end)
 
 One:on('hello', function (f)
   f.data.hello.push('hello')
-  f.finish()
 end)
 
 One:on('goodbye', function (f)
   f.data.hello.push('goodbye')
-  f.finish()
 end)
 
 describe( '.detour', function ()

@@ -23,7 +23,6 @@ end)
 
 Sec:on('div', function (o)
   o.data.result.push('div')
-  o.finish()
 end)
 
 describe( 'parent', function ()

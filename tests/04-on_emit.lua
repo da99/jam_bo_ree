@@ -8,7 +8,6 @@ local _      = require("underscore")._
 
 TH:on('parent run', function (o)
   o.data.result.push('parent run')
-  o.finish()
 end)
 
 TH:on('add', function (o)
@@ -23,7 +22,6 @@ end)
 
 H:on('div', function (o)
   o.data.result.push('div')
-  o.finish()
 end)
 
 describe( 'parent run', function ()

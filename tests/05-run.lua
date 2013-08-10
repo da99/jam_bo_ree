@@ -10,8 +10,8 @@ describe( 'run', function ()
   it( 'runs functions in sequential order', function ()
     local d = {};
     One:run(
-      function (o) d.push(1); o.finish() end,
-      function (o) d.push(2); o.finish() end
+      function (o) d.push(1) end,
+      function (o) d.push(2) end
     )
     assert.same(d, {1,2})
   end)
@@ -23,8 +23,8 @@ describe( 'run', function ()
       d.push(1)
       Two:run(
         o,
-        function (o) d.push(2); o.finish() end,
-        function (o) d.push(3); o.finish() end
+        function (o) d.push(2) end,
+        function (o) d.push(3) end
      )
    end)
 

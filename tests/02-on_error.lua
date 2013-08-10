@@ -10,7 +10,7 @@ One:on('not_found', function (o, err)
 end)
 
 One:on('subtract', function (o)
-  o.finish('not_found', 1)
+  return 'not_found', 1
 end)
 
 One:on('raise nested err', function (o)
@@ -18,11 +18,11 @@ One:on('raise nested err', function (o)
 end)
 
 One:on('error not found', function (o)
-  o.finish('made up error', 1)
+  return 'made up error', 1
 end)
 
 Ho:on('nested', function (o)
-  o.finish('not_found', 2)
+  return 'not_found', 2
 end)
 
 describe( 'error handling', function ()

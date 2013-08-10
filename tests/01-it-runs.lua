@@ -6,17 +6,14 @@ local T = Jam.new()
 
 T:on('add', function (o)
   _.push(o.data.result, 1)
-  o.finish()
 end)
 
 T:on('add', function (o)
   _.push(o.data.result, 2)
-  o.finish()
 end)
 
 T:on('mult', 'div', function (o)
   _.push(o.data.result, o.run.proc_list[0])
-  o.finish()
 end)
 
 
@@ -48,12 +45,10 @@ describe( '.run', function ()
     local o = {};
     a:on('one', function (d)
       _.extend(o, d.data, {two='b'})
-      d.finish()
     end)
 
     a:on('one', function (d)
       _.extend(o, d.data, {three='c'})
-      d.finish()
     end)
 
     a:run('one', {zero = 0}, {one = 1})
@@ -93,7 +88,7 @@ describe( '.run', function ()
 
   it( 'passes last value as second argument to callbacks', function ()
     local last = null;
-    T:on('a', function (f) f.finish(1) end)
+    T:on('a', function (f) return 1 end)
     T:on('a', function (f, l) last = l;  end)
     T:run('a')
 
@@ -125,12 +120,12 @@ describe( '.run .includes', function ()
 
   it( 'runs events in .includes', function ()
     local t1 = Tally_Ho.new()
-    t1:on('one', function (f) f.data.vals.push(1) f.finish() end)
-    t1:on('two', function (f) f.data.vals.push(2) f.finish() end)
+    t1:on('one', function (f) f.data.vals.push(1) end)
+    t1:on('two', function (f) f.data.vals.push(2) end)
 
     local t2 = Tally_Ho.new(t1, t1, t1)
-    t2:on('one', function (f) f.data.vals.push(3) f.finish() end)
-    t2:on('two', function (f) f.data.vals.push(4) f.finish() end)
+    t2:on('one', function (f) f.data.vals.push(3) end)
+    t2:on('two', function (f) f.data.vals.push(4) end)
 
     local o = {vals={}};
     t2:run('one', 'two', o)
@@ -139,16 +134,16 @@ describe( '.run .includes', function ()
 
   it( 'runs events in .includes of the .includes', function ()
     local t1 = Tally_Ho.new()
-    t1:on('add', function (f) f.data.vals.push(1) f.finish() end)
+    t1:on('add', function (f) f.data.vals.push(1) end)
 
     local t2 = Tally_Ho.new(t1)
-    t2:on('add', function (f) f.data.vals.push(2) f.finish() end)
+    t2:on('add', function (f) f.data.vals.push(2) end)
 
     local t3 = Tally_Ho.new(t2)
-    t3:on('add', function (f) f.data.vals.push(3) f.finish() end)
+    t3:on('add', function (f) f.data.vals.push(3) end)
 
     local t4 = Tally_Ho.new(t3)
-    t4:on('add', function (f) f.data.vals.push(4) f.finish() end)
+    t4:on('add', function (f) f.data.vals.push(4) end)
 
     local o = {vals={}};
     t4:run('add', o)
