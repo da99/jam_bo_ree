@@ -1,6 +1,4 @@
 
-if os.getenv('IS_DEV')
-  require 'pl.strict'
 
 local setmetatable = setmetatable
 local print        = print
@@ -27,6 +25,7 @@ end
 -- Clear globals. --------------------------
 -- -----------------------------------------
 setfenv(1, {})
+
 -- -----------------------------------------
 
 
@@ -69,11 +68,11 @@ meta = {
   list = function (self, raw_name, create_if_needed)
     local o = self;
     local name = canon_name(raw_name);
-    if (not o.funcs[name]) and create_if_needed then
-      o.funcs[name] = {};
+    if (not o.events[name]) and create_if_needed then
+      o.events[name] = {};
     end
 
-    return o.funcs[name] || [];
+    return o.events[name] or {}
   end,
 
   entire_list_for = function (self, name)
@@ -104,7 +103,7 @@ meta = {
     local args  = {...}
     local tasks = {}
     if (#self:entire_list_for(args[1]) == 0) then
-      throw new Error("Error handlers not found for: " + args[1])
+      error("Error handlers not found for: " + args[1])
     end
 
     return self:run(unpack(args))
@@ -134,7 +133,7 @@ meta = {
     end);
 
     local parent = _.detect(args, function (u)
-      return u && u.is_task_env
+      return u and u.is_task_env
     end);
 
     local non_data = _.flatten({funcs, parent});
@@ -143,7 +142,7 @@ meta = {
     local data = nil
 
     _.each(args, function (u)
-      if (_.isObject(u) && _.indexOf(non_data, u) < 1 && !u.is_task_env) then
+      if (_.isObject(u) and _.indexOf(non_data, u) < 1 and not u.is_task_env) then
         if not data then
           data = u
         else
@@ -159,7 +158,7 @@ meta = {
       //    .run(parent,     func1, func2);
       //
     ]]--
-    if (str_funcs.length === 0) then
+    if (str_funcs.length == 0) then
       local t    = M.new()
       local name = 'one-off'
       _.each(funcs, function (f)
@@ -169,7 +168,7 @@ meta = {
       return t:run(unpack(_.compact({parent, name, data})));
     end -- ==== if
 
-    Run.new(self, parent, (data || {}), funcs):run()
+    Run.new(self, parent, (data or {}), funcs):run()
 
     return self
   end -- .run -----------------------
@@ -205,8 +204,9 @@ local Run = {}
 function Run.do_next(self, ...)
 
   local args = {...}
-  if (#args == 1)
-    self.val = args[1];
+  if (#args == 1) then
+    self.val = args[1]
+  end
 
   self.last = args[1];
 
@@ -231,11 +231,11 @@ end
 function Run.run(self)
 
   if (self.tasks) then
-    throw new Error("Already running.");
+    error("Already running.");
   end
 
   self.tasks = {}
-  if (!self.parent) then
+  if not self.parent then
     _.push( self.tasks, self.tally:list('parent run') )
   end
 
@@ -257,9 +257,9 @@ end
 
 function Run.new(tally, parent, init_data, arr)
 
-  local r     = {
+  local r = {
     tally  = tally,
-    parent = parent
+    parent = parent,
     data   = init_data
   }
 
@@ -302,8 +302,8 @@ function Task_Env.finish (self, ...)
   local name_or_val = select(1, ...)
   local err         = select(2, err)
 
-  if (self.is_done || self.run.is_done) then
-    throw new Error(".finish called more than once.")
+  if (self.is_done or self.run.is_done) then
+    error(".finish called more than once.")
   end
 
   self.is_done = true
@@ -313,7 +313,7 @@ function Task_Env.finish (self, ...)
     if (self.run.parent) then
       return self.run.parent:finish(name_or_val, err)
     else
-      return self.run.tally:run_error(name_or_val, self.data, {error: err})
+      return self.run.tally:run_error(name_or_val, self.data, {error=err})
     end
   end
 
