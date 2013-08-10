@@ -20,3 +20,18 @@ describe(".on", function ()
     assert.equal(f2, j.events.ADD[2]);
   end);
 end);
+
+describe(".run", function ()
+  it("runs funcs in order added", function ()
+    local j = Jam.new()
+    local o = {}
+    j:on('add', function () o[#o+1] = 1 end);
+    j:on('add', function () o[#o+1] = 2 end);
+    j:on('add', function () o[#o+1] = 3 end);
+    j:run('add');
+    assert.same(o, {1,2,3});
+  end);
+end);
+
+
+
