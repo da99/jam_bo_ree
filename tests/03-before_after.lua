@@ -34,7 +34,7 @@ describe( 'hooks', function ()
 
   it( 'runs hooks in defined order', function ()
       TH:run('add', {result={}}, function (o)
-        assert.same( o.data.result, [1,2,3,4,5])
+        assert.same( o.data.result, {1,2,3,4,5})
       end)
   end)
 

@@ -26,7 +26,7 @@ describe( 'multi run', function ()
   it( 'runs functions in sequential order', function ()
     local o = {l={}};
     One:run('one', 'two', o)
-    assert.same(o.l, [1,2,3])
+    assert.same(o.l, {1,2,3})
   end)
 
   it( 'runs last callback at end', function ()
@@ -36,7 +36,7 @@ describe( 'multi run', function ()
       o.finish()
     end)
 
-    assert.same(o.l, [1,2,3,'4'])
+    assert.same(o.l, {1,2,3,'4'})
   end)
 
 end) -- === end desc

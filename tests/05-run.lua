@@ -4,7 +4,6 @@ local _      = require("underscore")._
   , One    = require("../lib/tally_ho").Tally_Ho.new()
   , Two    = require("../lib/tally_ho").Tally_Ho.new()
   , Third  = require("../lib/tally_ho").Tally_Ho.new()
-;
 
 describe( 'run', function ()
 
@@ -14,7 +13,7 @@ describe( 'run', function ()
       function (o) d.push(1); o.finish() end,
       function (o) d.push(2); o.finish() end
     )
-    assert.same(d, [1,2])
+    assert.same(d, {1,2})
   end)
 
   it( 'finishes parent when functions are done', function ()
@@ -24,14 +23,14 @@ describe( 'run', function ()
       d.push(1)
       Two:run(
         o,
-        function (o) { d.push(2) o.finish() },
-        function (o) { d.push(3) o.finish() }
+        function (o) d.push(2); o.finish() end,
+        function (o) d.push(3); o.finish() end
      )
    end)
 
     One:run('finishes parent')
 
-    assert.same(d, [1,2,3])
+    assert.same(d, {1,2,3})
   end)
 
 end) -- === end desc

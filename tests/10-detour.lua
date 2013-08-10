@@ -29,7 +29,7 @@ describe( '.detour', function ()
       end)
     end)
 
-    assert.same(o, {hello=['before hello', 'hello', 'goodbye', 'last goodbye']})
+    assert.same(o, {hello={'before hello', 'hello', 'goodbye', 'last goodbye'}})
   end)
 
   it( 'includes data of parent', function ()
@@ -40,7 +40,7 @@ describe( '.detour', function ()
       end)
     end)
 
-    assert.same(o, {hello=['before hello', 'hello', 'goodbye', 'last goodbye']})
+    assert.same(o, {hello={'before hello', 'hello', 'goodbye', 'last goodbye'}})
   end)
 
 end) -- === end desc

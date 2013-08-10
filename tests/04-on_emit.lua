@@ -31,7 +31,7 @@ describe( 'parent run', function ()
   it( 'runs function only once', function ()
       local o = {result={}};
       TH:run('add', o, function ()
-        assert.same(o.result, ['parent run', 'add', 'sub', 'div'])
+        assert.same(o.result, {'parent run', 'add', 'sub', 'div'})
       end)
   end)
 

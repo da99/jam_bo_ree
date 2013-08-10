@@ -31,7 +31,7 @@ describe( 'parent', function ()
   it( 'runs last callback after nested children are finished', function ()
       local o = {result={}};
       First:run('add', o, function ()
-        assert.same(o.result, ['add', 'sub', 'multi', 'div'])
+        assert.same(o.result, {'add', 'sub', 'multi', 'div'})
       end)
   end)
 

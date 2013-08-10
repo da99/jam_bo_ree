@@ -39,7 +39,7 @@ describe( '.run', function ()
     end)
 
     T:run('div', {result={}}, function (o)
-      assert.same( o.data.result, ['div'])
+      assert.same( o.data.result, {'div'})
     end)
   end)
 
@@ -68,7 +68,7 @@ describe( '.run', function ()
 
     local o = {vals = {}}
     T:run('spaced          NAME', o)
-    assert.same(o, {vals=[1]})
+    assert.same(o, {vals={1}})
   end)
 
   it( 'ignores capitalization of event name upon .on and .run', function ()
@@ -78,7 +78,7 @@ describe( '.run', function ()
 
     local o = {vals={}}
     T:run('STRANGE CApS', o)
-    assert.same(o, {vals=[1]})
+    assert.same(o, {vals={1}})
   end)
 
   it( 'ignores surrounding spaces of event name upon .on and .run', function ()
@@ -88,7 +88,7 @@ describe( '.run', function ()
 
     local o = {vals={}}
     T:run('non-trim   NAME', o)
-    assert.same(o, {vals=[1]})
+    assert.same(o, {vals={1}})
   end)
 
   it( 'passes last value as second argument to callbacks', function ()
@@ -134,7 +134,7 @@ describe( '.run .includes', function ()
 
     local o = {vals={}};
     t2:run('one', 'two', o)
-    assert.same(o, {vals=[1,3,2,4]})
+    assert.same(o, {vals={1,3,2,4}})
   end)
 
   it( 'runs events in .includes of the .includes', function ()
@@ -152,7 +152,7 @@ describe( '.run .includes', function ()
 
     local o = {vals={}};
     t4:run('add', o)
-    assert.same(o, {vals=[1,2,3,4]})
+    assert.same(o, {vals={1,2,3,4}})
   end)
 end) --  === end desc
 
