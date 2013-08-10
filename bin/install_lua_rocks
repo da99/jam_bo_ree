@@ -13,5 +13,6 @@ set -u -e -o pipefail
 my_luarocks install moonrocks
 my_luarocks install penlight
 my_luarocks install underscore
+my_luarocks install busted
 
 
