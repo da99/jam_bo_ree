@@ -1,5 +1,6 @@
 
-require 'pl.strict'
+if os.getenv('IS_DEV')
+  require 'pl.strict'
 
 local setmetatable = setmetatable
 local print        = print
