@@ -1,52 +1,40 @@
 
-local _      = require("underscore")._
-  , assert = require("assert")
-  , One    = require("../lib/tally_ho").Tally_Ho.new()
-  , Ho     = require("../lib/tally_ho").Tally_Ho.new()
-;
+local _   = require"underscore"
+local stringx = require"pl.stringx"
+local Jam = require"jam_bo_ree"
+local One = Jam.new()
+local Ho  = Jam.new()
 
-One:on('not_found', function (o, err)
-  o.data.result.push(err)
+One:on_error('not_found', function (o, err)
+  _.push(o.result, err)
 end)
 
-One:on('subtract', function (o)
+One:on('raise not_found', function (o)
   return 'not_found', 1
 end)
 
-One:on('raise nested err', function (o)
-  Ho:run(o, 'nested', {})
-end)
-
-One:on('error not found', function (o)
-  return 'made up error', 1
-end)
-
-Ho:on('nested', function (o)
-  return 'not_found', 2
+One:on('raise made up error', function (o)
+  return 'made up error', "rand val"
 end)
 
 describe( 'error handling', function ()
 
   it( 'runs error handler', function ()
     local o = {result={}};
-    One:run('subtract', o)
-    assert.same( o.error, 1)
-  end)
-
-  it( 'catches errors bubbled up from nested flows', function ()
-    local o = {result={}};
-    One:run('raise nested err', o)
-    assert.same( o.error, 2)
+    One:run('raise not_found', o)
+    assert.same( {result={1}}, o )
   end)
 
   it( 'raises error if no error handlers found', function ()
     local err = null;
-    try {
-      One:run('error not found')
-    } catch(e) {
-      err = e;
-    }
+    local a, b = pcall(One.run, One, 'raise made up error')
+    local pieces = _.split(b, ':')
+    _.shift(pieces)
+    _.shift(pieces)
+    local msg = stringx.strip(_.join(pieces, ':'))
 
-    assert.equal(err.message, "Error handlers not found for: made up error")
+    assert.same(false, a)
+    assert.same("No error handler found for: MADE UP ERROR: rand val", msg)
   end)
+
 end) -- === end desc

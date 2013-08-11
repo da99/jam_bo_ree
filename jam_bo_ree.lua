@@ -3,6 +3,7 @@
 local setmetatable = setmetatable
 local print        = print
 local select       = select
+local error        = error
 
 local unpack       = unpack
 local stringx      = require 'pl.stringx'
@@ -37,17 +38,22 @@ setfenv(1, {})
 Jam_Bo_Ree = {
   on = function (self, raw_name, func)
     local name = canon_name(raw_name)
-    if not self.events[name] then
-      self.events[name] = {}
+    if not self.ons[name] then
+      self.ons[name] = {}
     end
-    local list = self.events[name]
+    local list = self.ons[name]
     list[#list+1] = func
+    return self
+  end,
+
+  on_error = function (self, raw_name, func)
+    self.on_errs[canon_name(raw_name)] = func
     return self
   end,
 
   events_for = function (self, raw_name)
     name = canon_name(raw_name)
-    return self.events[name];
+    return self.ons[name];
   end,
 
   run = function (self, ...)
@@ -70,11 +76,11 @@ Jam_Bo_Ree = {
   list = function (self, raw_name, create_if_needed)
     local o = self;
     local name = canon_name(raw_name);
-    if (not o.events[name]) and create_if_needed then
-      o.events[name] = {};
+    if (not o.ons[name]) and create_if_needed then
+      o.ons[name] = {};
     end
 
-    return o.events[name] or {}
+    return o.ons[name] or {}
   end,
 
   entire_list_for = function (self, name)
@@ -178,13 +184,14 @@ Jam_Bo_Ree = {
     end
 
     -- === Run error if found === --
-    local name     = canon_name(results[1])
+    local err_name = canon_name(results[1])
     local err      = results[2]
-    local err_func = self.on_error[name]
+    local err_func = self.on_errs[err_name]
     if err_func then
-      return err_func(err)
+      return err_func(data or {}, err)
     end
-    error("No error handler found for: " .. name .. ": " .. err)
+
+    error("No error handler found for: " .. err_name .. ": " .. err)
   end -- .run -----------------------
 
 
@@ -193,7 +200,8 @@ Jam_Bo_Ree = {
 function Jam_Bo_Ree.new(...)
   local new = {}
   setmetatable(new, {__index = Jam_Bo_Ree})
-  new.events   = {}
+  new.ons      = {}
+  new.on_errs  = {}
 
   local args = {...}
 
