@@ -129,20 +129,20 @@ describe( '.run .includes', function ()
     assert.equal(t3.includes[2]._val, t2._val)
   end)
 
-  it( 'filters out duplicates among arguments in .includes #zzz', function ()
+  it( 'filters out duplicates among arguments in .includes', function ()
     local t1 = Jam.new()
     local t2 = Jam.new(t1, t1, t1)
-    assert.equal(2, select('#', t2.includes))
+    assert.equal(2, table.getn(t2.includes))
   end)
 
   it( 'runs events in .includes', function ()
     local t1 = Jam.new()
-    t1:on('one', function (f) _.push(f.data.vals, 1) end)
-    t1:on('two', function (f) _.push(f.data.vals, 2) end)
+    t1:on('one', function (f) _.push(f.vals, 1) end)
+    t1:on('two', function (f) _.push(f.vals, 2) end)
 
     local t2 = Jam.new(t1, t1, t1)
-    t2:on('one', function (f) _.push(f.data.vals, 3) end)
-    t2:on('two', function (f) _.push(f.data.vals, 4) end)
+    t2:on('one', function (f) _.push(f.vals, 3) end)
+    t2:on('two', function (f) _.push(f.vals, 4) end)
 
     local o = {vals={}};
     t2:run('one', 'two', o)
@@ -151,16 +151,16 @@ describe( '.run .includes', function ()
 
   it( 'runs events in .includes of the .includes', function ()
     local t1 = Jam.new()
-    t1:on('add', function (f) _.push(f.data.vals, 1) end)
+    t1:on('add', function (f) _.push(f.vals, 1) end)
 
     local t2 = Jam.new(t1)
-    t2:on('add', function (f) _.push(f.data.vals, 2) end)
+    t2:on('add', function (f) _.push(f.vals, 2) end)
 
     local t3 = Jam.new(t2)
-    t3:on('add', function (f) _.push(f.data.vals, 3) end)
+    t3:on('add', function (f) _.push(f.vals, 3) end)
 
     local t4 = Jam.new(t3)
-    t4:on('add', function (f) _.push(f.data.vals, 4) end)
+    t4:on('add', function (f) _.push(f.vals, 4) end)
 
     local o = {vals={}};
     t4:run('add', o)

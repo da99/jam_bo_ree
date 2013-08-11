@@ -172,7 +172,7 @@ Jam_Bo_Ree = {
 
     -- === Process final results === --
     local results = {Run.new(self, parent_run, (data or {}), funcs):run()}
-    local l       = select('#', results)
+    local l       = _.size(results)
     if l  < 2 then
       return results[1]
     end
@@ -254,7 +254,7 @@ function Run.run(self)
 
   _.detect(self.tasks, function (func)
     local args = {func(self.data, self.last)}
-    local l    = select('#', args)
+    local l    = _.size(args)
 
     if l == 0 then
       self.last = nil
