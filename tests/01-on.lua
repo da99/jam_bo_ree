@@ -9,8 +9,8 @@ describe(".on", function ()
     j:on("add", f1)
     j:on("add", f2)
 
-    assert.equal(f1, j.events.ADD[1])
-    assert.equal(f2, j.events.ADD[2])
+    assert.equal(f1, j.ons.ADD[1])
+    assert.equal(f2, j.ons.ADD[2])
   end)
 end) -- describe -------------
 
