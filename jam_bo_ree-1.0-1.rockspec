@@ -2,8 +2,8 @@
 package = "jam_bo_ree"
 version = "1.0-1"
 source = {
-  url = "https://github.com/da99/jam_bo_ree.git",
-  tag = "1.0",
+  url = "http://github.com/da99/jam_bo_ree.git",
+  tag = "master",
   dir = "."
 }
 description = {
@@ -23,6 +23,6 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    jam_bo_ree = "jam_bo_ree.lua"
+    jam_bo_ree = "jam_bo_ree.lua",
   }
 }
