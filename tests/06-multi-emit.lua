@@ -1,21 +1,20 @@
 
-local _      = require("underscore")._
-  , assert = require("assert")
-  , One    = require("../lib/tally_ho").Tally_Ho.new()
-  , Two    = require("../lib/tally_ho").Tally_Ho.new()
-  , Third  = require("../lib/tally_ho").Tally_Ho.new()
-;
+local _     = require("underscore")
+local Jam   = require "jam_bo_ree"
+local One   = Jam.new()
+local Two   = Jam.new()
+local Third = Jam.new()
 
 One:on('one', function (o)
-  o.data.l.push(1)
+  _.push(o.l, 1)
 end)
 
 One:on('two', function (o)
-  o.data.l.push(2)
+  _.push(o.l, 2)
 end)
 
 One:on('after two', function (o)
-  o.data.l.push(3)
+  _.push(o.l, 3)
 end)
 
 describe( 'multi run', function ()
@@ -29,7 +28,7 @@ describe( 'multi run', function ()
   it( 'runs last callback at end', function ()
     local o = {l={}};
     One:run('one', 'two', o, function (o)
-      o.data.l.push('4')
+      _.push(o.l, '4')
     end)
 
     assert.same(o.l, {1,2,3,'4'})
