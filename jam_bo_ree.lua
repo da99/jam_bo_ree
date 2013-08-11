@@ -2,6 +2,7 @@
 
 local setmetatable = setmetatable
 local print        = print
+local select       = select
 
 local unpack       = unpack
 local stringx      = require 'pl.stringx'
@@ -9,11 +10,8 @@ local sip          = require 'pl.sip'
 local pl_utils     = require 'pl.utils'
 local _            = require 'underscore'
 
-local M     = {}
-local meta  = {}
-
-local Run = {}
-local Task_Env = {}
+local Jam_Bo_Ree = {is_jam_bo_ree = true}
+local Run        = {is_run = true}
 
 local WHITE = "%s+";
 
@@ -36,7 +34,7 @@ setfenv(1, {})
 -- ================================================================
 -- ================== Jam Bo Ree ==================================
 -- ================================================================
-meta = {
+Jam_Bo_Ree = {
   on = function (self, raw_name, func)
     local name = canon_name(raw_name)
     if not self.events[name] then
@@ -136,17 +134,17 @@ meta = {
       return _.isString(u)
     end);
 
-    local parent = _.detect(args, function (u)
-      return u and u.is_task_env
+    local parent_run = _.detect(args, function (u)
+      return (_.isObject(u) and u.is_run)
     end);
 
-    local non_data = _.flatten({funcs, parent});
+    local non_data = _.flatten({funcs, parent_run});
 
     -- === grab and merge data objects ===
     local data = nil
 
     _.each(args, function (u)
-      if (_.isObject(u) and _.indexOf(non_data, u) < 1 and not u.is_task_env) then
+      if (_.isObject(u) and _.indexOf(non_data, u) < 1 and not u.is_run) then
         if not data then
           data = u
         else
@@ -156,45 +154,54 @@ meta = {
     end);
 
     --[[
-      // if non string names, only funcs:
+      // if run is called without any string funcs:
       // Example:
-      //    .run(parent, {}, func1, func2);
-      //    .run(parent,     func1, func2);
+      //    .run(parent_run, {}, func1, func2);
+      //    .run(parent_run,     func1, func2);
       //
     ]]--
     if ((not str_funcs) or #str_funcs == 0) then
-      local t    = M.new()
+      local t    = Jam_Bo_Ree.new()
       local name = 'one-off'
       _.each(funcs, function (f)
         t:on(name, f);
       end);
 
-      return t:run(unpack(_.compact({parent, name, data})));
+      return t:run(unpack(_.compact({parent_run, name, data})));
     end -- ==== if
 
-    Run.new(self, parent, (data or {}), funcs):run()
+    -- === Process final results === --
+    local results = {Run.new(self, parent_run, (data or {}), funcs):run()}
+    local l       = select('#', results)
+    if l  < 2 then
+      return results[1]
+    end
 
-    return self
+    -- === Run error if found === --
+    local name     = canon_name(results[1])
+    local err      = results[2]
+    local err_func = self.on_error[name]
+    if err_func then
+      return err_func(err)
+    end
+    error("No error handler found for: " .. name .. ": " .. err)
   end -- .run -----------------------
 
 
-}
+} -- Jam_Bo_Ree ---------------------
 
-function M.new(...)
+function Jam_Bo_Ree.new(...)
   local new = {}
-  setmetatable(new, {__index = meta});
-  new.events = {};
-  new.includes = {new};
+  setmetatable(new, {__index = Jam_Bo_Ree})
+  new.events   = {}
 
   local args = {...}
 
-  if (#args > 0) then
-    _.each(_.flatten(_.reverse(args), function (v)
-      _.unshift(t.includes, v)
-    end))
+  -- generate .includes table (array)
+  new.includes = _.uniq(_.flatten(args))
 
-    t.includes = _.uniq(t.includes)
-  end
+  -- include itself in .includes
+  _.push(new.includes, new)
 
   return new
 end
@@ -204,12 +211,13 @@ end
 -- ================== Run (private) ===============================
 -- ================================================================
 
-function Run.new(tally, parent, init_data, arr)
+function Run.new(jam_bo_ree, parent_run, data, arr)
 
   local r = {
-    tally  = tally,
-    parent = parent,
-    data   = init_data
+    jam_bo_ree = jam_bo_ree,
+    parent_run = parent_run,
+    data       = data,
+    val        = nil
   }
 
   setmetatable(r, {__index = Run})
@@ -234,109 +242,47 @@ function Run.run(self)
 
   self.tasks = {}
 
-  -- If this is an adam/eve run, then do 'parent run'
-  if not self.parent then
-    _.push( self.tasks, self.tally:list('parent run') )
-  end
-
   _.each(self.proc_list, function (name)
     if (_.isFunction(name)) then
       return _.push(self.tasks, name);
     end
 
-    _.push(self.tasks, self.tally:entire_list_for(name));
-
+    _.push(self.tasks, self.jam_bo_ree:entire_list_for(name));
   end)
 
   self.tasks = _.flatten(self.tasks);
 
-  _.each(self.tasks, function (func)
-    if (self.is_done) then
-      return;
+  _.detect(self.tasks, function (func)
+    local args = {func(self.data, self.last)}
+    local l    = select('#', args)
+
+    if l == 0 then
+      self.last = nil
+    elseif l == 1 then
+      self.last = args[1]
+      self.val  = args[1]
+    else
+      self.last    = nil
+      self.is_stop = true
+      self.err     = args[1]
+      self.err_msg = args[2]
     end
 
-    local vals = {func(Task_Env.new(self), self.last)}
-    local l    = set('#', vals)
-    if l = 0 then
-      self.last = nil
-    elseif l = 1 then
-      self.last = vals[1]
-    else
-      self.parent:finish(vals[1], vals[2])
-      self.is_done = true
-    end
+    return self.is_stop;
   end);
 
-  if (self.is_done) then
-    return
+  if (self.err) then
+    return self.err, self.err_msg
+  else
+    return self.val
   end
-
-  if self.parent then
-    return self.parent:finish(self.last)
-  end
-
-  return self.last
 end
-
-
--- ================================================================
--- ================== Task_Env (private) ==========================
--- ================================================================
-
-
-Task_Env.new = function (run)
-  local t  = {}
-  setmetatable(t, {__index = Task_Env})
-
-  t.run         = run
-  t.data        = run.data
-  t.last        = run.last
-  t.val         = run.val
-  t.is_task_env = true
-
-  return t
-end
-
-function Task_Env.finish (self, ...)
-
-  local args        = {...}
-  local name_or_val = select(1, ...)
-  local err         = select(2, err)
-
-  if (self.is_done or self.run.is_done) then
-    error(".finish called more than once.")
-  end
-
-  self.is_done = true
-
-  -- if .finish(name, err);
-  if (#args > 1) then -- error
-    if (self.run.parent) then
-      return self.run.parent:finish(name_or_val, err)
-    else
-      return self.run.tally:run_error(name_or_val, self.data, {error=err})
-    end
-  end
-
-  return self.run:do_next(unpack(args))
-end
-
-function Task_Env.detour (self, ...)
-  local args = {...}
-  _.unshift( args, self )
-  _.unshift( args, self.data )
-
-  return self.run.tally:run(unpack(args));
-end
-
-
-
 
 
 
 -- ====================================================
-M.canon_name = canon_name;
-return M
+Jam_Bo_Ree.canon_name = canon_name;
+return Jam_Bo_Ree
 -- ====================================================
 
 

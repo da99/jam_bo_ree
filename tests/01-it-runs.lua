@@ -5,22 +5,22 @@ local _   = require("underscore")
 local T = Jam.new()
 
 T:on('add', function (o)
-  _.push(o.data.result, 1)
+  _.push(o.result, 1)
 end)
 
 T:on('add', function (o)
-  _.push(o.data.result, 2)
+  _.push(o.result, 2)
 end)
 
 T:on('mult', 'div', function (o)
-  _.push(o.data.result, "mult or div")
+  _.push(o.result, "mult or div")
 end)
 
 
 -- .RUN ------------------------------------------------
 describe( '.run', function ()
 
-  it("runs funcs in order #added", function ()
+  it("runs funcs in order added", function ()
     local j = Jam.new()
     local o = {}
     j:on( 'add', function () _.push(o, 1) end)
@@ -30,13 +30,23 @@ describe( '.run', function ()
     assert.same(o, {1,2,3})
   end)
 
+  it("returns value of last function run", function ()
+    local j = Jam.new()
+    local o = {}
+    j:on( 'add', function () return 1 end)
+    j:on( 'add', function () return 2 end)
+    j:on( 'add', function () return 3 end)
+
+    assert.same(3, j:run('add'))
+  end);
+
   it( 'runs on multi-defined events', function ()
     T:run('mult', {result={}}, function (o)
-      assert.same( o.data.result, {"mult or div"})
+      assert.same( o.result, {"mult or div"})
     end)
 
     T:run('div', {result={}}, function (o)
-      assert.same( o.data.result, {"mult or div"})
+      assert.same( o.result, {"mult or div"})
     end)
   end)
 
@@ -44,11 +54,11 @@ describe( '.run', function ()
     local a = Jam.new()
     local o = {};
     a:on('one', function (d)
-      _.extend(o, d.data, {two='b'})
+      _.extend(o, d, {two='b'})
     end)
 
     a:on('one', function (d)
-      _.extend(o, d.data, {three='c'})
+      _.extend(o, d, {three='c'})
     end)
 
     a:run('one', {zero = 0}, {one = 1})
@@ -58,7 +68,7 @@ describe( '.run', function ()
 
   it( 'squeezes spaces in event names upon .on and .run', function ()
     T:on('spaced    NAME', function (f)
-      f.data.vals = 1
+      f.vals = 1
     end)
 
     local o = {vals=nil}
@@ -69,7 +79,7 @@ describe( '.run', function ()
   it( 'ignores capitalization of event name upon .on and .run', function ()
     local j = Jam.new()
     j:on('strange CAPS', function (f)
-      f.data.vals.push(1)
+      _.push(f.vals, 1)
     end)
 
     local o = {vals={}}
@@ -81,7 +91,7 @@ describe( '.run', function ()
   it( 'ignores surrounding spaces of event name upon .on and .run', function ()
     local j = Jam.new()
     j:on('  non-trim NAME  ', function (f)
-      f.data.vals.push(1)
+      _.push(f.vals, 1)
     end)
 
     local o = {vals={}}
@@ -114,14 +124,15 @@ describe( '.run .includes', function ()
     t2._val = 2;
 
     local t3 = Jam.new(t1, t2)
+
     assert.equal(t3.includes[1]._val, t1._val)
     assert.equal(t3.includes[2]._val, t2._val)
   end)
 
-  it( 'filters out duplicates among arguments in .includes', function ()
+  it( 'filters out duplicates among arguments in .includes #zzz', function ()
     local t1 = Jam.new()
     local t2 = Jam.new(t1, t1, t1)
-    assert.equal(t2.includes.length, 2)
+    assert.equal(2, select('#', t2.includes))
   end)
 
   it( 'runs events in .includes', function ()
