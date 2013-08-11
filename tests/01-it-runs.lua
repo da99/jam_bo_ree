@@ -2,7 +2,10 @@
 local Jam = require("jam_bo_ree")
 local _   = require("underscore")
 
-local T = Jam.new()
+local T     = Jam.new()
+local One   = Jam.new()
+local Two   = Jam.new()
+local Third = Jam.new()
 
 T:on('add', function (o)
   _.push(o.result, 1)
@@ -112,6 +115,18 @@ describe( '.run', function ()
 
 end) --  === end desc
 
+
+describe(".run(func1, func2, ...)", function ()
+  it( 'runs functions in sequential order', function ()
+    local d = {};
+    One:run(
+      function (o) _.push(d, 1) end,
+      function (o) _.push(d, 2) end
+    )
+    assert.same(d, {1,2})
+  end)
+
+end); -- describe --
 
 
 describe( '.run .includes', function ()
