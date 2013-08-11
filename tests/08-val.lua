@@ -1,8 +1,7 @@
 
-local _      = require("underscore")._
-  , assert = require("assert")
-  , One    = require("../lib/tally_ho").Tally_Ho.new()
-;
+local _   = require("underscore")
+local Jam = require "jam_bo_ree"
+local One = Jam.new()
 
 describe( 'val', function ()
 

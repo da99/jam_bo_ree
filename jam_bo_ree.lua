@@ -267,8 +267,9 @@ function Run.run(self)
     if l == 0 then
       self.last = nil
     elseif l == 1 then
-      self.last = args[1]
-      self.val  = args[1]
+      self.last     = args[1]
+      self.val      = args[1]
+      self.data.val = self.val
     else
       self.last    = nil
       self.is_stop = true
