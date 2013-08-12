@@ -1,6 +1,6 @@
 
 package = "jam_bo_ree"
-version = "1.0-1"
+version = "1.0-2"
 source = {
   url = "http://github.com/da99/jam_bo_ree.git",
   tag = "master",
