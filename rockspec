@@ -3,7 +3,7 @@ package = "jam_bo_ree"
 version = "1.0-1"
 source = {
   url = "http://github.com/da99/jam_bo_ree.git",
-  tag = "master",
+  tag = "1.0-1",
   dir = "."
 }
 description = {
